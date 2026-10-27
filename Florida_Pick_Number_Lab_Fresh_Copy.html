@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Florida Pick 2 & Pick 3 Number Lab</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d31;--panel2:#17243a;--ink:#f4f7fb;--muted:#a9b7ca;--gold:#f7c948;--teal:#65dfc3;--line:#2a3a54}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172b49 0,#0b1220 60%);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);line-height:1.5}
+main{max-width:1080px;margin:auto;padding:28px 18px 60px}.hero{padding:28px 0 20px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:var(--teal);font-size:.78rem;font-weight:800}
+h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:.5rem 0 1rem}h2{margin-top:0;font-size:1.25rem}.sub{max-width:720px;color:var(--muted);font-size:1.05rem}
+.notice{background:#332819;border:1px solid #71562a;padding:14px 16px;border-radius:14px;color:#ffe8af;margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:linear-gradient(145deg,var(--panel),#101a2a);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0}
+label{display:block;font-weight:700;margin:12px 0 6px}select,textarea,input,button{font:inherit}select,textarea,input{width:100%;background:#0a1322;color:var(--ink);border:1px solid #354763;border-radius:10px;padding:12px}textarea{min-height:150px;resize:vertical;font-family:ui-monospace,SFMono-Regular,monospace}
+button{background:var(--gold);color:#172033;border:0;padding:12px 17px;border-radius:10px;font-weight:800;cursor:pointer;margin-top:14px}button.secondary{background:#243650;color:var(--ink);border:1px solid #3c506e}
+.results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.stat{background:var(--panel2);border:1px solid var(--line);padding:14px;border-radius:14px}.stat strong{display:block;font-size:1.8rem;color:var(--gold)}.muted{color:var(--muted);font-size:.92rem}.digits{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ball{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:var(--gold);color:#172033;font-size:1.1rem;font-weight:900}.ball.cool{background:var(--teal)}.barrow{display:grid;grid-template-columns:48px 1fr 40px;gap:8px;align-items:center;margin:9px 0}.bar{height:10px;background:#263750;border-radius:20px;overflow:hidden}.bar span{height:100%;display:block;background:linear-gradient(90deg,var(--teal),var(--gold))}.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 18px}.tabs button{margin:0}.tabs button{background:#17243a;color:#f4f7fb;border:2px solid #8293aa;transition:background .15s ease,color .15s ease,border-color .15s ease;min-height:48px}
+.tabs button[aria-selected="true"]{background:#f7c948;color:#101827;border:3px solid #ffffff;box-shadow:0 0 0 3px #f7c948,0 4px 12px rgba(0,0,0,.35);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.tabs button[aria-selected="false"]{background:#17243a;color:#e2eaf5;border:2px solid #8293aa;box-shadow:none;text-decoration:none}
+.tabs button:focus-visible{outline:3px solid #65dfc3;outline-offset:4px}
+.tabs button[aria-selected="true"]::before{content:"✓ ";font-weight:900}
+@media (prefers-reduced-motion:reduce){.tabs button{transition:none}}.tab-panel[hidden]{display:none}.ranked{display:flex;align-items:center;gap:12px;padding:12px;margin:8px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}.ranked .number{font-size:1.5rem;font-weight:900;letter-spacing:.08em;min-width:3.5rem}.ranked-main{flex:1;min-width:0}.ranked-meta{display:flex;justify-content:space-between;gap:8px;font-size:.86rem;color:var(--muted);margin:3px 0 6px}.ranked-bar{height:8px;background:#263750;border-radius:20px;overflow:hidden}.ranked-bar span{height:100%;display:block;background:linear-gradient(90deg,var(--teal),var(--gold))}.rank-label{font-size:.78rem;font-weight:800;border:1px solid #3c506e;border-radius:999px;padding:3px 8px;color:var(--teal);white-space:nowrap}.blue-note{border:1px solid #2864a6;background:#102744;color:#d8eaff;padding:12px;border-radius:12px}
+footer{color:var(--muted);font-size:.85rem;margin-top:25px;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.results{grid-template-columns:1fr}.card{padding:16px}}
+</style>
+</head>
+<body><main>
+<section class="hero">
+<div class="eyebrow">Florida Lottery • Data exploration</div>
+<h1>Pick 2 & Pick 3<br><span style="color:var(--gold)">Number Lab</span></h1>
+<p class="sub">Explore digit frequency, recent trends, and historical draw patterns for Florida Pick 2 and Pick 3. Use past results to study numbers—not to assume the next draw can be known.</p>
+<div class="notice"><strong>Important:</strong> No number can be guaranteed. Lottery draws are designed to be random; “hot” numbers in past draws do not reliably predict future results. This tool is for historical analysis and entertainment, not a promise of winning.</div>
+</section>
+<nav class="tabs" role="tablist" aria-label="Number Lab sections">
+<button id="analysisTab" role="tab" aria-selected="true" aria-controls="analysisPanel">Historical Analysis</button>
+<button id="predictionTab" role="tab" aria-selected="false" aria-controls="predictionPanel">Daily Prediction Dashboard</button>
+</nav>
+<section id="analysisPanel" class="tab-panel" role="tabpanel" aria-labelledby="analysisTab">
+<div class="grid">
+<section class="card">
+<h2>1. Choose a game</h2>
+<label for="game">Lottery game</label><select id="game"><option value="2">Pick 2 (00–99)</option><option value="3" selected>Pick 3 (000–999)</option></select>
+<label for="window">Recent-draw window for trend comparison</label><select id="window"><option value="20">Last 20 draws</option><option value="50" selected>Last 50 draws</option><option value="100">Last 100 draws</option></select>
+<label for="drawTime">Drawing time</label><select id="drawTime"><option value="ALL">All drawings</option><option value="MID">Midday only</option><option value="EVE">Evening only</option></select>
+<p class="muted">Paste historical results one draw per line and keep leading zeroes (for example, 07 or 042). For Midday/Evening filters, entries need a time label such as “10/15/2026 MID 042” or “10/15/2026 EVE 517”. Unlabeled entries are included only in All drawings.</p>
+</section>
+<section class="card">
+<h2>2. Add historical results</h2>
+<label for="draws">Draw results (one per line)</label>
+<textarea id="draws" spellcheck="false" placeholder="Pick 3 example format&#10;042&#10;517&#10;008&#10;294"></textarea>
+<button id="analyze">Analyze results</button>
+<button id="sample" class="secondary">Load demo data</button>
+<p class="muted">Demo data is randomly generated and is not actual Florida Lottery history.</p>
+<div class="notice" style="margin-top:16px"><strong>Official results import</strong><p class="muted" style="color:#ffe8af">Try loading the latest official history PDF automatically. If the lottery server blocks browser access, download the PDF from the official link and import it below.</p>
+<button id="officialLoad">Load latest official history</button>
+<label for="pdfFile">Or import a downloaded official history PDF</label><input id="pdfFile" type="file" accept="application/pdf,.pdf">
+<div class="muted" id="loadStatus" aria-live="polite">No official history loaded yet.</div>
+<p><a style="color:var(--teal)" href="https://floridalottery.com/games/draw-games/gameshistory" target="_blank" rel="noopener">Open Florida Lottery official Draw History</a></p></div>
+</section>
+</div>
+<section class="card" id="output" aria-live="polite">
+<h2>Analysis results</h2>
+<p class="muted">Add draw results and select “Analyze results” to calculate historical frequencies.</p>
+</section>
+<section class="card">
+<h2>How the analysis works</h2>
+<ul>
+<li><strong>Hot digits:</strong> digits that appeared most often in the entered results.</li>
+<li><strong>Cold digits:</strong> digits that appeared least often in the entered results.</li>
+<li><strong>Midday vs. Evening:</strong> filter labeled historical records to analyze drawing times separately.</li>
+<li><strong>Position analysis:</strong> for Pick 3, tracks hundreds, tens, and ones separately.</li>
+<li><strong>Frequency-based idea:</strong> shows a combination assembled from historically frequent digits. It is a descriptive example, not a forecast or a higher-probability guarantee.</li>
+</ul>
+</section>
+</section>
+<section id="predictionPanel" class="tab-panel" role="tabpanel" aria-labelledby="predictionTab" hidden>
+<section class="card">
+<h2>Daily Prediction Dashboard</h2>
+<p class="muted">Ranks combinations using the historical results currently loaded in the Historical Analysis tab. This is a frequency-based research shortlist—not a forecast of the next draw.</p>
+<div class="grid">
+<div><label for="dashboardGame">Game</label><select id="dashboardGame"><option value="2">Pick 2</option><option value="3" selected>Pick 3</option></select></div>
+<div><label for="rankCount">Combinations to show</label><select id="rankCount"><option value="5">Top 5</option><option value="10" selected>Top 10</option><option value="20">Top 20</option></select></div>
+</div>
+<button id="rankCombos">Rank combinations from loaded results</button>
+<div id="dashboardOutput" aria-live="polite"><p class="muted">Load and analyze official or historical results in the Historical Analysis tab, then rank combinations here.</p></div>
+<div class="blue-note"><strong>How to read the rankings</strong><p>“Top pattern match” means a combination’s digits line up with the most frequent digits in their respective positions in your selected history. The relative score compares listed combinations with the highest-ranked combination in this analysis; it is <strong>not</strong> the chance of winning. No digit or combination is guaranteed.</p></div>
+</section>
+</section>
+<footer>Official source links: <a style="color:var(--teal)" href="https://files.floridalottery.com/exptkt/pick2_winning-numbers-history.pdf" target="_blank" rel="noopener">Pick 2 history PDF</a> · <a style="color:var(--teal)" href="https://files.floridalottery.com/exptkt/pick3_winning-numbers-history.pdf" target="_blank" rel="noopener">Pick 3 history PDF</a>. Independent educational tool; not affiliated with or endorsed by the Florida Lottery. Official PDF access depends on the Lottery server and your browser. Verify results against official records. Please play responsibly and set a budget.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function randDraw(n){return Array.from({length:n},()=>String(Math.floor(Math.random()*(n===20?100:1000))).padStart(n===20?2:3,'0'))}
+function parse(){
+ const len=+$('game').value;
+ const lines=$('draws').value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ const selectedTime=$('drawTime').value;
+ const records=lines.map(line=>{
+  const tm=line.match(/\b(MIDDAY|MID|M|EVENING|EVE|E)\b/i);
+  const tag=tm?(/^(MIDDAY|MID|M)$/i.test(tm[1])?'MID':'EVE'):null;
+  const nums=[...line.matchAll(/\b\d+\b/g)].map(m=>m[0]);
+  return {line,tag,draw:nums.length?nums[nums.length-1]:''};
+ });
+ const selected=records.filter(r=>selectedTime==='ALL'||r.tag===selectedTime);
+ const valid=selected.filter(r=>new RegExp('^\\d{1,'+len+'}$').test(r.draw)).map(r=>r.draw.padStart(len,'0')).filter(x=>Number(x)<10**len);
+ return {valid,invalid:selected.length-valid.length,len,tagged:records.filter(r=>r.tag).length,unlabeled:records.filter(r=>!r.tag).length,selectedTime};
+}
+function analyze(){const {valid,invalid,len,tagged,unlabeled,selectedTime}=parse();if(!valid.length){$('output').innerHTML='<h2>Analysis results</h2><p>Please paste at least one valid '+len+'-digit draw. Keep leading zeroes when possible.</p>';return}
+const digits=Array.from({length:len},()=>Array(10).fill(0));const overall=Array(10).fill(0);valid.forEach(s=>[...s].forEach((d,i)=>{digits[i][+d]++;overall[+d]++}));
+const windowSize=+$('window').value;const recent=valid.slice(-windowSize);const recentCounts=Array.from({length:len},()=>Array(10).fill(0));recent.forEach(s=>[...s].forEach((d,i)=>recentCounts[i][+d]++));
+const rank=a=>a.map((count,digit)=>({digit,count})).sort((a,b)=>b.count-a.count||a.digit-b.digit);
+const hot=rank(overall).slice(0,3),cold=rank(overall).slice(-3).reverse();
+const combo=digits.map(arr=>rank(arr)[0].digit).join('');
+let html='<h2>Analysis results — '+({'ALL':'All drawings','MID':'Midday only','EVE':'Evening only'}[selectedTime])+'</h2><p class="muted">'+(tagged?'Time-labeled records in loaded data: '+tagged+'. ':'')+(selectedTime!=='ALL'&&unlabeled?'Unlabeled entries are excluded from this time-specific view. ':'')+'</p><div class="results"><div class="stat"><span class="muted">Valid draws analyzed</span><strong>'+valid.length+'</strong></div><div class="stat"><span class="muted">Trend window</span><strong>'+recent.length+'</strong><span class="muted">most recent entered draws</span></div><div class="stat"><span class="muted">Skipped entries</span><strong>'+invalid+'</strong><span class="muted">invalid format</span></div></div>';
+html+='<h3>Most frequent digits overall</h3><p class="muted">These are the digits that appeared most often in the data you entered.</p><div class="digits">'+hot.map(x=>'<span class="ball">'+x.digit+'</span>').join('')+'</div>';
+html+='<h3>Frequency by digit</h3>'+rank(overall).sort((a,b)=>a.digit-b.digit).map(x=>'<div class="barrow"><strong>'+x.digit+'</strong><div class="bar"><span style="width:'+Math.max(1,x.count/Math.max(...overall)*100)+'%"></span></div><span>'+x.count+'</span></div>').join('');
+html+='<h3>Position leaders</h3>';const names=len===2?['First digit','Second digit']:['Hundreds','Tens','Ones'];
+html+=digits.map((arr,i)=>'<p><strong>'+names[i]+':</strong> '+rank(arr).slice(0,3).map(x=>x.digit+' ('+x.count+')').join(' · ')+'</p>').join('');
+html+='<h3>Recent-window leaders</h3>'+recentCounts.map((arr,i)=>'<p><strong>'+names[i]+':</strong> '+rank(arr).slice(0,3).map(x=>x.digit+' ('+x.count+')').join(' · ')+'</p>').join('');
+html+='<h3>Frequency-based combination (for study only)</h3><div class="digits"><span class="ball cool">'+combo+'</span></div><p class="muted">This combines the most frequent digit in each position across all entered draws. It is not a prediction, and it has no guaranteed or demonstrated advantage over other combinations.</p>';
+html+='<h3>Least frequent digits overall</h3><div class="digits">'+cold.map(x=>'<span class="ball cool">'+x.digit+'</span>').join('')+'</div>';
+$('output').innerHTML=html}
+$('analyze').addEventListener('click',analyze);$('drawTime').addEventListener('change',()=>{if($('draws').value.trim())analyze()});
+$('sample').addEventListener('click',()=>{$('draws').value=Array.from({length:60},()=>String(Math.floor(Math.random()*Math.pow(10,+$('game').value))).padStart(+$('game').value,'0')).join('\n');analyze()});
+$('game').addEventListener('change',()=>{$('draws').value='';$('output').innerHTML='<h2>Analysis results</h2><p class="muted">Load official history or paste results for the selected game, then analyze.</p>'});
+const pdfUrls={2:'https://files.floridalottery.com/exptkt/pick2_winning-numbers-history.pdf',3:'https://files.floridalottery.com/exptkt/pick3_winning-numbers-history.pdf'};
+let pdfjsPromise;
+function loadPdfJs(){if(pdfjsPromise)return pdfjsPromise;pdfjsPromise=new Promise((resolve,reject)=>{if(window.pdfjsLib){resolve(window.pdfjsLib);return}const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';sc.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';resolve(window.pdfjsLib)};sc.onerror=()=>reject(new Error('Could not load the PDF reader. Check your internet connection.'));document.head.appendChild(sc)});return pdfjsPromise}
+async function pdfToDraws(data,len){const pdfjs=await loadPdfJs();const doc=await pdfjs.getDocument({data}).promise;const out=[];for(let n=1;n<=doc.numPages;n++){const page=await doc.getPage(n);const content=await page.getTextContent();const rows=new Map();for(const item of content.items){if(!item.str||!item.str.trim())continue;const y=Math.round(item.transform[5]);if(!rows.has(y))rows.set(y,[]);rows.get(y).push({x:item.transform[4],t:item.str.trim()})}for(const row of rows.values()){row.sort((a,b)=>a.x-b.x);const line=row.map(v=>v.t).join(' ');const date=line.match(/\b\d{1,2}\/\d{1,2}\/\d{4}\b/);if(!date)continue;const after=line.slice(date.index+date[0].length);const nums=[...after.matchAll(/(?:^|\s)(\d)\s*[-–]\s*(\d)\s*[-–]\s*(\d)(?=\s|$)/g)].map(m=>m[1]+m[2]+m[3]);const pairs=[...after.matchAll(/(?:^|\s)(\d)\s*[-–]\s*(\d)(?=\s|$)/g)].map(m=>m[1]+m[2]);if(len===3&&nums.length>=2){out.push({date:date[0],draw:nums[0],time:'MID'},{date:date[0],draw:nums[1],time:'EVE'})}else if(len===2&&pairs.length>=2){out.push({date:date[0],draw:pairs[0],time:'MID'},{date:date[0],draw:pairs[1],time:'EVE'})}}}if(!out.length)throw new Error('Could not read draw rows from this PDF. Try downloading the official PDF and importing it again.');return out}
+async function importPdfData(data,label){const len=+$('game').value;const status=$('loadStatus');status.style.cssText='';status.textContent='Reading historical PDF…';try{const rows=await pdfToDraws(data,len);const seen=new Set();const unique=rows.filter(r=>{const k=r.date+'-'+r.time;if(seen.has(k))return false;seen.add(k);return true});$('draws').value=unique.map(r=>r.date+' '+r.time+' '+r.draw).join('\n');$('drawTime').value='ALL';status.textContent='✓ PDF uploaded and processed successfully! '+unique.length+' '+(len===2?'Pick 2':'Pick 3')+' historical draw records were imported from '+label+'. You can now analyze All Drawings, Midday Only, or Evening Only.';status.style.cssText='display:block;margin-top:12px;padding:12px;border:2px solid #16803d;border-radius:8px;background:#e8f7ec;color:#14532d;font-weight:700;';analyze()}catch(e){status.textContent='PDF import unsuccessful: '+e.message+' Official PDF links are available below.';status.style.cssText='display:block;margin-top:12px;padding:12px;border:2px solid #b42318;border-radius:8px;background:#fff0f0;color:#8a1c13;font-weight:700;'}}
+$('officialLoad').addEventListener('click',async()=>{const len=+$('game').value;$('loadStatus').style.cssText='';$('loadStatus').textContent='Connecting to the official Florida Lottery history PDF…';try{const res=await fetch(pdfUrls[len],{cache:'no-store'});if(!res.ok)throw new Error('Official PDF request returned '+res.status);const data=new Uint8Array(await res.arrayBuffer());await importPdfData(data,'official Florida Lottery PDF')}catch(e){$('loadStatus').textContent='Automatic access was blocked by the browser or Lottery server. Download the official '+(len===2?'Pick 2':'Pick 3')+' PDF using the link below, then choose it in “import a downloaded official history PDF”.';$('loadStatus').style.cssText='display:block;margin-top:12px;padding:12px;border:2px solid #b42318;border-radius:8px;background:#fff0f0;color:#8a1c13;font-weight:700;';}});
+$('pdfFile').addEventListener('change',async ev=>{const file=ev.target.files&&ev.target.files[0];if(!file)return;if(file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf')){$('loadStatus').textContent='Please choose a PDF file.';return}try{await importPdfData(new Uint8Array(await file.arrayBuffer()),file.name)}catch(e){$('loadStatus').textContent='PDF import unsuccessful: '+e.message}});
+
+const tabButtons=[$('analysisTab'),$('predictionTab')];
+function showTab(id){const prediction=id==='predictionTab';$('analysisPanel').hidden=prediction;$('predictionPanel').hidden=!prediction;tabButtons.forEach(b=>b.setAttribute('aria-selected',String(b.id===id)));}
+tabButtons.forEach(b=>b.addEventListener('click',()=>showTab(b.id)));
+$('dashboardGame').addEventListener('change',()=>{if($('game').value!==$('dashboardGame').value){$('game').value=$('dashboardGame').value;$('draws').value='';$('output').innerHTML='<h2>Analysis results</h2><p class="muted">Load results for the selected game, then analyze.</p>';$('dashboardOutput').innerHTML='<p class="muted">The game changed. Load and analyze results for this game in Historical Analysis first.</p>';}});
+$('game').addEventListener('change',()=>{$('dashboardGame').value=$('game').value;});
+$('rankCombos').addEventListener('click',()=>{
+ const len=+$('dashboardGame').value;
+ if(+$('game').value!==len){$('dashboardOutput').innerHTML='<p>Please select the same game in Historical Analysis, then load and analyze its results.</p>';return;}
+ const {valid}=parse();
+ if(!valid.length){$('dashboardOutput').innerHTML='<p>Please load or paste historical draws and analyze them in Historical Analysis first.</p>';return;}
+ const positionCounts=Array.from({length:len},()=>Array(10).fill(0));
+ valid.forEach(draw=>[...draw].forEach((d,i)=>positionCounts[i][+d]++));
+ const total=valid.length;
+ const candidates=[];
+ // Enumerate every possible combination and score it using per-position historical frequency.
+ // This score is descriptive only; it does not estimate a guaranteed result.
+ const maxScore=positionCounts.reduce((prod,a)=>prod*Math.max(...a),1);
+ for(let n=0;n<10**len;n++){
+  const combo=String(n).padStart(len,'0');
+  let score=1;
+  [...combo].forEach((d,i)=>{score*=positionCounts[i][+d]/total;});
+  candidates.push({combo,score});
+ }
+ candidates.sort((a,b)=>b.score-a.score||a.combo.localeCompare(b.combo));
+ const count=+$('rankCount').value;
+ const topScore=candidates[0]?.score||0;
+ let html='<div class="results"><div class="stat"><span class="muted">Draws analyzed</span><strong>'+total+'</strong></div><div class="stat"><span class="muted">Shortlist size</span><strong>'+count+'</strong></div><div class="stat"><span class="muted">Top pattern score</span><strong>100</strong><span class="muted">relative index</span></div></div><p><strong>Ranking method:</strong> multiplies each digit’s observed frequency in its position.</p><p class="muted">The relative index sets the highest-ranked combination to 100 and compares the others with it. It is not a winning probability. In a fair lottery, past results do not make a particular future combination guaranteed.</p>';
+ candidates.slice(0,count).forEach((c,i)=>{const rel=topScore?c.score/topScore*100:0;const label=rel>=80?'Closest frequency match':rel>=50?'Similar frequency pattern':'Lower relative match';html+='<div class="ranked"><strong>#'+(i+1)+'</strong><span class="number">'+c.combo+'</span><div class="ranked-main"><div class="ranked-meta"><span>'+label+'</span><span>Relative index: '+rel.toFixed(1)+'</span></div><div class="ranked-bar" role="img" aria-label="Relative pattern index '+rel.toFixed(1)+' out of 100"><span style="width:'+Math.max(0,Math.min(100,rel))+'%"></span></div></div></div>';});
+ html+='<p class="muted">These labels describe similarity to historical digit frequencies only. They do not mean “hot,” “due,” or more likely to win, and no combination is guaranteed.</p>';
+ $('dashboardOutput').innerHTML=html;
+});
+
+</script></body></html>
